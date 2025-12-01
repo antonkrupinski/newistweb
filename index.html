@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Private-IP Redirector</title>
+  <style>
+    body{font-family:Arial;margin:40px;background:#001F4D;color:#fff}
+    input,button{padding:10px;border-radius:8px;border:none}
+    .row{display:flex;gap:10px;align-items:center}
+  </style>
+</head>
+<body>
+  <h1>Search & Go</h1>
+  <form id="f">
+    <div class="row">
+      <input id="q" placeholder="Search term or path (e.g. /status)" />
+      <select id="target">
+        <option value="192.168.1.100">Device A (192.168.1.100)</option>
+        <option value="192.168.1.101">Device B (192.168.1.101)</option>
+      </select>
+      <button type="submit">Go</button>
+    </div>
+    <p style="opacity:.8">Note: your device must be on same LAN as the target IP for this to work.</p>
+  </form>
+
+  <script>
+    document.getElementById('f').addEventListener('submit', e => {
+      e.preventDefault();
+      const q = (document.getElementById('q').value || '').trim();
+      const ip = document.getElementById('target').value;
+      // Basic validation for IPv4 (private range check not enforced here)
+      const ipv4Regex = /^(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[01]?\\d?\\d)){3}$/;
+      if (!ipv4Regex.test(ip)) { alert('Invalid IP'); return; }
+
+      // Build URL: you can choose whether to use http or https and append path/query
+      const path = q.startsWith('/') ? q : '/search?q=' + encodeURIComponent(q);
+      const url = 'http://' + ip + path;
+
+      // Ask user to confirm (safety)
+      if (!confirm('You will be redirected to: ' + url + '\\nMake sure you are on the same network. Continue?')) return;
+
+      // Redirect
+      window.location.href = url;
+    });
+  </script>
+</body>
+</html>
